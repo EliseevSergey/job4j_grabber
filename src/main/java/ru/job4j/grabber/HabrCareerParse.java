@@ -17,7 +17,7 @@ public class HabrCareerParse {
     private static final int PAGES_QTY = 5;
 
     public static void main(String[] args) throws IOException {
-        for (int p = 1; p < PAGES_QTY; p++) {
+        for (int p = 1; p <= PAGES_QTY; p++) {
             Connection connection = Jsoup.connect(String.format(PAGE_LINK + p));
             System.out.println(String.format("PAGE: %s", p));
             Document document = connection.get();
