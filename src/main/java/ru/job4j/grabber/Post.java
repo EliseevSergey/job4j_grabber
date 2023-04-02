@@ -58,15 +58,13 @@ public class Post {
             return false;
         }
         Post post = (Post) o;
-        return title.equals(post.title) && description.equals(post.description);
+        return id == post.id && link.equals(post.link);
     }
 
     @Override
     public int hashCode() {
-        int result = title.hashCode();
+        int result = Integer.hashCode(id);
         result = 31 * result + link.hashCode();
-        result = 31 * result + description.hashCode();
-        result = 31 * result + created.hashCode();
         return result;
     }
 
