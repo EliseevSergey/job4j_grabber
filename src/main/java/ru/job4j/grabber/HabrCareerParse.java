@@ -18,7 +18,7 @@ public class HabrCareerParse {
     private static final String SOURCE_LINK = "https://career.habr.com";
     private static final String PAGE_LINK =
             String.format("%s/vacancies/java_developer?page=", SOURCE_LINK);
-    private static final int PAGES_QTY = 1;
+    private static final int PAGES_QTY = 5;
 
     public static void main(String[] args) throws IOException {
         for (int p = 1; p <= PAGES_QTY; p++) {
