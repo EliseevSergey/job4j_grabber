@@ -8,9 +8,6 @@ import org.jsoup.select.Elements;
 import ru.job4j.utils.HabrCareerDateTimeParser;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -19,10 +16,11 @@ public class HabrCareerParse {
     private static final String PAGE_LINK =
             String.format("%s/vacancies/java_developer?page=", SOURCE_LINK);
     private static final int PAGES_QTY = 5;
+    private static final HabrCareerDateTimeParser TIME_PARSER = new HabrCareerDateTimeParser();
 
     public static void main(String[] args) throws IOException {
-        for (int p = 1; p <= PAGES_QTY; p++) {
-            Connection connection = Jsoup.connect(String.format(PAGE_LINK + p));
+        for (int p = 5; p <= PAGES_QTY; p++) {
+            Connection connection = Jsoup.connect(String.format("%s%s", PAGE_LINK, p));
             System.out.println(String.format("PAGE: %s", p));
             Document document = connection.get();
             Elements rows = document.select(".vacancy-card__inner");
@@ -33,41 +31,37 @@ public class HabrCareerParse {
                 Element dateElement = row.select(".vacancy-card__date").first();
                 Element dateTimeElement = dateElement.child(0);
                 String dataTime = dateTimeElement.attr("datetime");
-                var timeParser = new HabrCareerDateTimeParser();
-                LocalDateTime localDateTime = timeParser.parse(dataTime);
                 String link = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
-                String description = null;
-                try {
-                    description = retrieveDescription(link);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                System.out.printf("%s %s %s %s%n", vacancyName, link, localDateTime, description);
+                System.out.printf("%s %s %s %s%n", vacancyName, link,
+                        TIME_PARSER.parse(dataTime),
+                        retrieveDescription(link));
             });
         }
     }
 
-    private static String retrieveDescription(String link) throws IOException {
+    private static String retrieveDescription(String link) {
         Connection connection = Jsoup.connect(link);
-        Document page = connection.get();
-        Elements rows = page.select(".style-ugc");
-        Scanner sc = new Scanner(rows.get(0).toString());
-        Pattern delimiter = Pattern.compile("</?\\w+>");
-        sc.useDelimiter(delimiter);
-        List<String> list = new ArrayList<>();
-        while (sc.hasNext()) {
-            String str = sc.next();
-            if (!str.isBlank()) {
-                list.add(str);
+        Document page = null;
+        try {
+            page = connection.get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Elements rows = page.select(".vacancy-description__text");
+        StringBuilder sb = new StringBuilder();
+        try (Scanner sc = new Scanner(rows.get(0).toString())) {
+            Pattern delimiter = Pattern.compile("</?\\w+>");
+            sc.useDelimiter(delimiter);
+            while (sc.hasNext()) {
+                String str = sc.next();
+                if (!str.isBlank()) {
+                    sb.append((str
+                            .replace("&nbsp;", " "))
+                                    .replaceAll("<.*>", "").trim())
+                            .append(System.lineSeparator());
+                }
             }
         }
-        list.remove(0);
-        StringBuilder sb = new StringBuilder();
-        list.forEach(s -> {
-            sb.append(s);
-            sb.append(System.lineSeparator());
-            }
-        );
         return sb.toString();
     }
 }
