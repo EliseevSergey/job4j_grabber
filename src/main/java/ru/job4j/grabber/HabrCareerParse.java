@@ -27,7 +27,7 @@ public class HabrCareerParse implements Parse {
 
     public static void main(String[] args) {
         HabrCareerParse parser = new HabrCareerParse(new HabrCareerDateTimeParser());
-        List<Post> download = parser.list("noMatterWhatToİnput");
+        List<Post> download = parser.list(PAGE_LINK);
         download.forEach(System.out::println);
     }
 
@@ -61,8 +61,8 @@ public class HabrCareerParse implements Parse {
     public List<Post> list(String link) {
         List<Post> rsl = new ArrayList<>();
         for (int p = 1; p <= PAGES_QTY; p++) {
-            Connection connection = Jsoup.connect(String.format("%s%s", PAGE_LINK, p));
-            System.out.println(String.format("PAGE: %s", p));
+            Connection connection = Jsoup.connect(String.format("%s%s", link, p));
+            System.out.printf("PAGE: %s%n", p);
             Document document;
             try {
                 document = connection.get();
