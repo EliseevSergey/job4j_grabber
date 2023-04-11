@@ -109,10 +109,7 @@ public class PsqlStore implements Store {
         }
         try (PsqlStore store = new PsqlStore(cfg)) {
             HabrCareerParse parser = new HabrCareerParse(new HabrCareerDateTimeParser());
-            String sourceLink = "https://career.habr.com";
-            String pageLink =
-                    String.format("%s/vacancies/java_developer?page=1", sourceLink);
-            List<Post> download = parser.list(pageLink);
+            List<Post> download = parser.list();
             store.save(download.get(1));
             store.save(download.get(2));
             List<Post> all = store.getAll();
