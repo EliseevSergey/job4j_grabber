@@ -1,7 +1,6 @@
 package ru.job4j.grabber;
 
-import ru.job4j.utils.HabrCareerDateTimeParser;
-
+import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
@@ -52,9 +51,9 @@ public class PsqlStore implements Store {
 
     @Override
     public List<Post> getAll() {
-        List<Post> all = new ArrayList<>();
+       List<Post> all = new ArrayList<>();
        try (Statement st = cnn.createStatement()) {
-           String select = "select * from post;";
+           String select = "select * from post";
            try (ResultSet resultSet = st.executeQuery(select)) {
                while (resultSet.next()) {
                    Post post = new Post();
@@ -69,7 +68,7 @@ public class PsqlStore implements Store {
        } catch (SQLException e) {
            throw new RuntimeException(e);
        }
-        return all;
+       return all;
     }
 
     @Override

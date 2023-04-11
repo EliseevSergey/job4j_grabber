@@ -42,9 +42,9 @@ public class RabbitDemo {
         }
 
         @Override
-        public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        public void execute(JobExecutionContext context) throws JobExecutionException {
             System.out.println("Rabbit runs here ...");
-            List<Long> store = (List<Long>) jobExecutionContext
+            List<Long> store = (List<Long>) context
                     .getJobDetail()
                     .getJobDataMap().get("store");
             store.add(System.currentTimeMillis());

@@ -1,4 +1,4 @@
-package ru.job4j.utils;
+package ru.job4j.grabber.utils;
 
 import java.time.LocalDateTime;
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
