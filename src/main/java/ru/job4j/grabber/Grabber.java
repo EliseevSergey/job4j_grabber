@@ -3,8 +3,8 @@ package ru.job4j.grabber;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
-
 import java.io.*;
+import java.util.List;
 import java.util.Properties;
 
 import static org.quartz.JobBuilder.newJob;
@@ -42,13 +42,31 @@ public class Grabber implements Grab {
         scheduler.scheduleJob(job, trigger);
     }
 
+    public static class GrabJob implements Job {
+        @Override
+        public void execute(JobExecutionContext context) {
+            JobDataMap map = context.getJobDetail().getJobDataMap();
+            Store store = (Store) map.get("store");
+            Parse parse = (Parse) map.get("parse");
+            String sourceLink = "https://career.habr.com";
+            String pageLink =
+                    String.format("%s/vacancies/java_developer?page=", sourceLink);
+            List<Post> pagePostList =  parse.list(pageLink);
+            pagePostList.forEach(store::save);
+        }
+    }
 
-
-
-
-
-    @Override
-    public void init() throws SchedulerException {
-
+    public static void main(String[] args) throws Exception {
+        var cfg = new Properties();
+        try (InputStream in = Grabber.class.getClassLoader()
+                .getResourceAsStream("app.properties")) {
+            cfg.load(in);
+        }
+        Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+        scheduler.start();
+        var parse = new HabrCareerParse(new HabrCareerDateTimeParser());
+        var store = new PsqlStore(cfg);
+        var time = Integer.parseInt(cfg.getProperty("time"));
+        new Grabber(parse, store, scheduler, time).start();
     }
 }
