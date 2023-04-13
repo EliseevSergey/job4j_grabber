@@ -55,9 +55,9 @@ public class Grabber implements Grab {
         }
     }
 
-    public void web(Store store) {
+    public void web(Store store, int port) {
         new Thread(() -> {
-            try (ServerSocket server = new ServerSocket(Integer.parseInt(cfg.getProperty("port")))) {
+            try (ServerSocket server = new ServerSocket(port)) {
                 while (!server.isClosed()) {
                     Socket socket = server.accept();
                     try (OutputStream out = socket.getOutputStream()) {
@@ -87,8 +87,8 @@ public class Grabber implements Grab {
         var parse = new HabrCareerParse(new HabrCareerDateTimeParser());
         var store = new PsqlStore(cfg);
         var time = Integer.parseInt(cfg.getProperty("time"));
-        new Grabber(parse, store, scheduler, time).init();
+        Grabber grabber = new Grabber(parse, store, scheduler, time);
+        grabber.init();
+        grabber.web(store, Integer.parseInt(cfg.getProperty("port")));
     }
-
-
 }
